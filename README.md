@@ -1,10 +1,10 @@
-# [Your Project Name]
+# TBD
 
 <!-- CI badge: after Session 4, replace ORG/REPO and the workflow filename, then uncomment:
 ![CI](https://github.com/ORG/REPO/actions/workflows/ci.yml/badge.svg)
 -->
 
-**Student:** [Your Name] · **Course:** CEN 5064 Software Design, Fall 2026 · **Partner:** [@partner-github-username]
+**Student:** Yousuf Habouh · **Course:** CEN 5064 Software Design, Fall 2026 · **Partner:** [@ghechavarria]
 
 ## Project (approval paragraph — write this by Sun Aug 30)
 
