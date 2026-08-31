@@ -37,10 +37,10 @@ instructor will follow it literally on conference days.]
 
 | Tier | Responsibilities in THIS system |
 |------|--------------------------------|
-| Presentation | [what your UI layer does] |
-| Service | [what your use-case/orchestration layer does] |
-| Domain | [your entities and business rules] |
-| Data | [how and where data is stored] |
+| Presentation | Displays Posts in a column list when checking a community with getPostList, displays comments in a column list under posts getCommentList. Will support light and dark mode with setLightMode |
+| Service | create an account createAccount, create a community createCommunity, edit a comment editComment, etc |
+| Domain | Accounts can only subscribe to 200 communities, can upvote once only per comment/post, a community can have 1 owner at most |
+| Data | SQL tables store account information, account sign in data, a table for comments, a table for posts, a table for communities |
 
 ### C4 — Context & Container (Session 3 studio)
 
