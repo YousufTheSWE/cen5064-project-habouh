@@ -15,7 +15,7 @@ Business Rules:
 - A user can subscribe to 200 communities at most (subscription is an option that enables notifications on new posts)
 - A community needs exactly 1 owner at all time.
 - A user can either upvote once, downvote once, or not vote for any single post/comment.
-- A user can only be signed in on 3 devices at once.
+- A user can only be signed in on a maximum of 3 devices at once.
 
 Core Features:
 - A person can make an account.
