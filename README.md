@@ -1,4 +1,4 @@
-# TBD
+# PostClient
 
 <!-- CI badge: after Session 4, replace ORG/REPO and the workflow filename, then uncomment:
 ![CI](https://github.com/ORG/REPO/actions/workflows/ci.yml/badge.svg)
@@ -8,7 +8,20 @@
 
 ## Project (approval paragraph — write this by Sun Aug 30)
 
-The system will implement a chatting application similar to Reddit, which will be called PostClient. I'll make this project by implementing a backend that allows for account creation and community creation, and a frontend that showcases posts on the involved communities for a user. I am making this because one of the main reasons users use the internet is to communicate with each other, and this will offer one more avenue of communication.
+The system will implement a chatting application, which will be called PostClient. I'll make this project by implementing a backend that allows for account creation and community creation, and a frontend that showcases posts on the involved communities for a user. I am making this because one of the main reasons users use the internet is to communicate with each other, and this will offer one more avenue of communication.
+
+Business Rules:
+- A user can be the owner of 10 communities at most.
+- A user can subscribe to 200 communities at most (subscription is an option that enables notifications on new posts)
+- A community needs exactly 1 owner at all time.
+- A user can either upvote once, downvote once, or not vote for any single post/comment.
+- A user can only be signed in on 3 devices at once.
+
+Core Features:
+- A person can make an account.
+- An account can make a community which they would own by default.
+- Accounts can create Posts under a community.
+- Accounts can post comments under a post or other comments.
 
 ## How to run
 
