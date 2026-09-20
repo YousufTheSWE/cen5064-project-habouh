@@ -43,49 +43,70 @@ instructor will follow it literally on conference days.]
 
 ### C4 — Context & Container (Session 3 studio)
 
-```mermaid
-%% Replace this placeholder with YOUR system's context diagram.
-flowchart TB
-    user([User]) -->|uses| system[Your System]
-    system -->|stores data in| db[(Database)]
-```
+## 1. Context Diagram
 
 ```mermaid
-%% Container view: your containers should match the tier table above.
 flowchart TB
-    subgraph YourSystem [Your System]
-        ui[Web UI / CLI<br/>Presentation] --> api[Application / Service]
-        api --> domain[Domain Model]
-        domain --> db[(Database<br/>Data tier)]
+    user([User]) -->|uses| postclient[PostClient]
+    postclient -->|uses| emailservice[Email Service]
+```
+
+## 2. Container Diagram
+
+```mermaid
+flowchart TB
+    subgraph PostClient
+        user[User]
+        pres[PostClient Website]
+        svc[PostClient Backend]
+        data[(Data)]
+
+        user -->|uses| pres -->|calls| svc --> |stores| data
     end
 ```
 
 ### UML — Class & Sequence (Session 3 studio)
 
-```mermaid
-%% Class diagram: your 3–4 core domain classes.
-classDiagram
-    class ExampleEntity {
-        -id: Long
-        -name: String
-        +doSomething()
-    }
-```
+## 3. Class Diagram
 
 ```mermaid
-%% Sequence diagram: ONE core use case, end to end.
+classDiagram
+    class Account {
+        -id: Long
+        -username: String
+    }
+    class Community {
+        -id: Long
+        -ownerId: Long
+    }
+    class Post {
+        -id: Long
+        -communityId: Long
+    }
+    class Comment {
+        -id: Long
+        -postId: Long
+    }
+
+    Account "1" --> "many" Community : owns
+    Account "1" --> "many" Post : writes
+    Community "1" --> "many" Post : contains
+    Post "1" --> "many" Comment : contains
+```
+
+## 4. Sequence Diagram — Posting a Comment
+
+```mermaid
 sequenceDiagram
     actor U as User
-    participant UI
-    participant S as Service
-    participant D as Data
-    U->>UI: action
-    UI->>S: request
-    S->>D: save/load
-    D-->>S: result
-    S-->>UI: response
-    UI-->>U: confirmation
+    participant UI as Website
+    participant S as Backend
+
+    U->>UI: write comment
+    UI->>S: submit comment
+    S-->>U: comment posted
 ```
+
 
 ## Architecture Decision Records
 
