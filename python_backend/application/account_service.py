@@ -1,5 +1,6 @@
 from domain.account import Account
 
+
 class AccountService:
     def __init__(self, repository):
         self._repository = repository

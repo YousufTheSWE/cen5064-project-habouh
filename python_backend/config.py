@@ -1,5 +1,6 @@
 from pathlib import Path
 
+
 def load_env(path: str = ".env") -> dict[str, str]:
     values = {}
     for line in Path(path).read_text().splitlines():

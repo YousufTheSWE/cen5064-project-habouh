@@ -3,6 +3,7 @@ from fastapi.responses import JSONResponse
 
 from domain.errors import DomainError, UsernameAlreadyExistsError
 
+
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(UsernameAlreadyExistsError)
     def conflict(request: Request, exc: UsernameAlreadyExistsError):
