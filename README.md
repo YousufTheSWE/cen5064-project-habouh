@@ -25,9 +25,18 @@ Core Features:
 ## How to run
 
 ```
-[Exact commands to build and run your system from a clean clone.
-Update this every time the steps change — your partner and your
-instructor will follow it literally on conference days.]
+To run the demo of this software, you need to be on a system with Python 3.14 and the latest version of node installed.
+
+To run the backend:
+  - Go to python_backend by doing `cd python_backend`
+  - Do `py -m venv venv`
+  - Do `pip install -r requirements.txt`
+  - Do `py main.py`
+
+To run the frontend:
+  - Go to react_frontend by doing `cd react_frontend`
+  - Do `npm install`
+  - Do `npm run dev`
 ```
 
 ## Architecture
