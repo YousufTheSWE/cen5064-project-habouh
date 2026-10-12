@@ -1,0 +1,24 @@
+.home-container {
+  max-width: 400px;
+  margin: 4rem auto;
+  text-align: center;
+}
+
+.home-button-group {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+}
+
+.home-btn {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+
+.signout-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+}
+

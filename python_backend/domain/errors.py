@@ -18,3 +18,8 @@ class PasswordTooShortError(DomainError):
 class UsernameAlreadyExistsError(DomainError):
     def __init__(self):
         super().__init__("Account creation failed: username already exists")
+
+
+class InvalidCredentialsError(DomainError):
+    def __init__(self):
+        super().__init__("Login failed: invalid username or password")

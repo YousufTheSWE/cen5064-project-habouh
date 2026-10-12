@@ -1,5 +1,6 @@
 import uvicorn
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from application.account_service import AccountService
 from config import load_env
@@ -16,7 +17,15 @@ def create_app() -> FastAPI:
     account_service = AccountService(SqliteAccountRepository(database))
 
     app = FastAPI()
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     register_error_handlers(app)
+
     app.include_router(account_routes(account_service))
     # app.include_router(post_routes(post_service), prefix="/v1")
     return app

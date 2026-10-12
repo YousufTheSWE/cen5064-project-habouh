@@ -7,6 +7,11 @@ class CreateAccountBody(BaseModel):
     password: str
 
 
+class LoginBody(BaseModel):
+    username: str
+    password: str
+
+
 def account_routes(service) -> APIRouter:
     router = APIRouter()
 
@@ -15,4 +20,9 @@ def account_routes(service) -> APIRouter:
         username = service.create_account(body.username, body.password)
         return {"message": "Account created", "username": username}
 
-    return router
+    @router.post("/login", status_code=200)
+    def login(body: LoginBody):
+        username = service.login(body.username, body.password)
+        return {"message": "Login successful", "username": username}
+
+    return router

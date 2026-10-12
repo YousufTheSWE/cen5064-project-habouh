@@ -22,3 +22,14 @@ class SqliteAccountRepository:
                 )
         except sqlite3.IntegrityError:
             raise UsernameAlreadyExistsError() from None
+
+    def find_by_username(self, username: str) -> Account | None:
+        with self._db.connect() as conn:
+            cursor = conn.execute(
+                "SELECT username, password_hash FROM accounts WHERE username = ?",
+                (username,),
+            )
+            row = cursor.fetchone()
+            if row is None:
+                return None
+            return Account(username=row[0], password_hash=row[1])
