@@ -15,6 +15,7 @@ Business Rules:
 - A user can subscribe to 200 communities at most (subscription is an option that enables notifications on new posts)
 - A community needs exactly 1 owner at all time.
 - A user can either upvote once, downvote once, or not vote for any single post/comment.
+- Passwords need to be at least 8 characters long.
 
 Core Features:
 - A person can make an account.
