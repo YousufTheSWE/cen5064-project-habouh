@@ -1,6 +1,6 @@
 import hashlib
 import hmac
-import random
+import secrets
 from dataclasses import dataclass
 
 from domain.errors import InvalidUsernameError, PasswordTooShortError
@@ -26,7 +26,7 @@ class Account:
 
 
 def _hash_password(password: str) -> str:
-    salt = random.randbytes(16)
+    salt = secrets.token_bytes(16)
     digest = hashlib.scrypt(password.encode(), salt=salt, n=2**14, r=8, p=1)
     return f"{salt.hex()}:{digest.hex()}"
 
@@ -40,4 +40,4 @@ def _verify_password(password: str, password_hash: str) -> bool:
         return hmac.compare_digest(actual_digest, expected_digest)
     except ValueError:
         return False
-
+
