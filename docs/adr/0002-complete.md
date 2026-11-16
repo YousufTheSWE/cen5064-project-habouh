@@ -1,7 +1,7 @@
 # ADR-0002: Add a way to create account and login [frontend]
 
 **Date:** 2026-09-21
-**Status:** pending
+**Status:** done
 
 ## Context
 

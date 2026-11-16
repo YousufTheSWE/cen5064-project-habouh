@@ -1,0 +1,199 @@
+.post-detail-page {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1.5rem;
+}
+
+.post-main-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+.post-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.post-detail-title {
+  font-size: 2rem;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.post-detail-meta {
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.75;
+  margin-bottom: 1.5rem;
+}
+
+.post-detail-body {
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: var(--text-h);
+  white-space: pre-wrap;
+}
+
+.post-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.comments-section {
+  text-align: left;
+}
+
+.comments-header {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: var(--text-h);
+}
+
+.comment-form-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comment-card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.comment-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  color: var(--text);
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.comment-card-desc {
+  font-size: 0.95rem;
+  color: var(--text-h);
+  line-height: 1.5;
+  white-space: pre-wrap;
+  margin: 0;
+}
+
+.comment-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+/* Post Layout with Voting */
+.post-main-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.post-main-content {
+  flex: 1;
+}
+
+/* Comment Layout with Voting */
+.comment-main-layout {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.comment-main-content {
+  flex: 1;
+}
+
+/* Voting widget */
+.vote-widget {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 40px;
+}
+
+.vote-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text);
+  font-size: 1.1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.vote-btn:hover {
+  background: var(--code-bg);
+  color: var(--text-h);
+}
+
+.vote-btn.upvoted {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.12);
+}
+
+.vote-btn.downvoted {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.vote-score {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-h);
+}
+
+.btn-danger {
+  padding: 0.65rem 1.2rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.08);
+  color: #ef4444;
+  transition: all 0.2s ease;
+}
+
+.btn-danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.btn-danger.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
