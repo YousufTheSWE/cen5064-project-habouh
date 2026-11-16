@@ -7,8 +7,8 @@ class InvalidUsernameError(DomainError):
         if not args:
             args = (
                 (
-                    "Account creation failed: username must be at least 1 character "
-                    "and contain only alphanumeric characters"
+                    "Account creation failed: username must contain only alphanumeric "
+                    "characters and underscores, with at least one non-underscore character"
                 ),
             )
         super().__init__(*args)

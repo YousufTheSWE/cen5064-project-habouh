@@ -17,7 +17,12 @@ class Account:
 
     @staticmethod
     def validate_username(username: str) -> None:
-        if not (username.isascii() and username.isalnum()):  # also rejects empty string
+        if not (
+            username
+            and username.isascii()
+            and all(c.isalnum() or c == "_" for c in username)
+            and any(c != "_" for c in username)
+        ):
             raise InvalidUsernameError()
 
     @staticmethod

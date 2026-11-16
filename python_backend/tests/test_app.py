@@ -1,4 +1,5 @@
 import pytest
+
 from domain.account import Account
 from domain.comment import Comment
 from domain.community import Community
@@ -17,6 +18,21 @@ def test_create_account_and_verify_password():
 def test_invalid_username():
     with pytest.raises(InvalidUsernameError):
         Account.create("invalid user!", "securepass123")
+    with pytest.raises(InvalidUsernameError):
+        Account.create("_", "securepass123")
+    with pytest.raises(InvalidUsernameError):
+        Account.create("___", "securepass123")
+    with pytest.raises(InvalidUsernameError):
+        Account.create("", "securepass123")
+
+
+def test_valid_username_with_underscores():
+    acc1 = Account.create("valid_user_1", "securepass123")
+    assert acc1.username == "valid_user_1"
+    acc2 = Account.create("_leading_and_trailing_", "securepass123")
+    assert acc2.username == "_leading_and_trailing_"
+    acc3 = Account.create("a_", "securepass123")
+    assert acc3.username == "a_"
 
 
 def test_password_too_short():

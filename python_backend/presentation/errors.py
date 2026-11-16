@@ -10,7 +10,6 @@ from domain.errors import (
     InvalidCredentialsError,
     PostNotFoundError,
     UnauthorizedActionError,
-    UserNotFoundError,
     UsernameAlreadyExistsError,
     UserNotFoundError,
 )

@@ -1,4 +1,7 @@
 import uvicorn
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+
 from application.account_service import AccountService
 from application.comment_service import CommentService
 from application.community_service import CommunityService
@@ -9,8 +12,6 @@ from data.comment_repository import SqliteCommentRepository
 from data.community_repository import SqliteCommunityRepository
 from data.database import Database
 from data.post_repository import SqlitePostRepository
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 from presentation.account_routes import account_routes
 from presentation.comment_routes import comment_routes
 from presentation.community_routes import community_routes

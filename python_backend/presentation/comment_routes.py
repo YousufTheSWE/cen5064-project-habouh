@@ -1,7 +1,8 @@
-from domain.errors import AuthenticationRequiredError
 from fastapi import APIRouter, Header, Query
-from presentation.auth_dependency import extract_token
 from pydantic import BaseModel
+
+from domain.errors import AuthenticationRequiredError
+from presentation.auth_dependency import extract_token
 
 
 class CreateCommentBody(BaseModel):

@@ -1,5 +1,6 @@
-from domain.errors import AuthenticationRequiredError
 from fastapi import Header
+
+from domain.errors import AuthenticationRequiredError
 
 
 def extract_token(

@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Header
-from presentation.auth_dependency import extract_token
 from pydantic import BaseModel
+
+from presentation.auth_dependency import extract_token
 
 
 class CreateCommunityBody(BaseModel):
