@@ -11,6 +11,22 @@ export default function HomePage() {
       {user ? (
         <>
           <h2>Welcome, {user}!</h2>
+          <div className="home-button-group">
+            <button
+              type="button"
+              onClick={() => navigate('/communities')}
+              className="home-btn"
+            >
+              Browse Communities
+            </button>
+            <button
+              type="button"
+              onClick={() => navigate('/settings')}
+              className="home-btn"
+            >
+              Settings
+            </button>
+          </div>
           <button type="button" onClick={logout} className="signout-btn">
             Sign out
           </button>

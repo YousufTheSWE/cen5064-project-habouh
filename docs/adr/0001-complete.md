@@ -1,7 +1,7 @@
 # ADR-0001: Add a way to create account
 
 **Date:** 2026-09-21
-**Status:** pending
+**Status:** done
 
 ## Context
 
