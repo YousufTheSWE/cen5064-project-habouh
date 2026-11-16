@@ -31,13 +31,13 @@ To run the backend:
   - Go to python_backend by doing `cd python_backend`
   - Do `py -m venv venv`
   - Do `pip install -r requirements.txt`
-  - Create a .env folder and specify DATABASE_PATH as the path to a database.db file that will be used for sqlite connection.
+  - Create a .env file and specify DATABASE_PATH as the path to a database.db file that will be used for sqlite connection.
   - Do `py main.py`
 
 To run the frontend:
   - Go to react_frontend by doing `cd react_frontend`
   - Do `npm install`
-  - Create a .env folder and specify VITE_BACKEND_DOMAIN to connect to backend (default should be http://127.0.0.1:8000)
+  - Create a .env file and specify VITE_BACKEND_DOMAIN to connect to backend (default should be http://127.0.0.1:8000)
   - Do `npm run dev`
 
 After running both, the link to access the service through the frontend will be shown in the powershell entry for the frontend.
