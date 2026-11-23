@@ -12,6 +12,7 @@ class Comment:
     description: str
     upvotes: int = 0
     downvotes: int = 0
+    is_approved: int = 0
 
     @staticmethod
     def create(
@@ -21,6 +22,7 @@ class Comment:
         comment_id: int | None = None,
         upvotes: int = 0,
         downvotes: int = 0,
+        is_approved: int = 0,
     ) -> "Comment":
         clean_desc = description.strip()
         if not clean_desc:
@@ -33,4 +35,5 @@ class Comment:
             description=clean_desc,
             upvotes=upvotes,
             downvotes=downvotes,
+            is_approved=is_approved,
         )

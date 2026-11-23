@@ -41,6 +41,7 @@ def comment_routes(service, account_service) -> APIRouter:
             "upvotes": c.upvotes,
             "downvotes": c.downvotes,
             "user_vote": user_vote,
+            "is_approved": c.is_approved,
         }
 
     @router.post("", status_code=201)

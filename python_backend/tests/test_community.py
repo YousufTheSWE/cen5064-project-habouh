@@ -5,6 +5,7 @@ from application.community_service import CommunityService
 from data.account_repository import SqliteAccountRepository
 from data.community_repository import SqliteCommunityRepository
 from data.database import Database
+from domain.community import Community
 from domain.errors import (
     CommunityLimitExceededError,
     CommunityNotFoundError,
@@ -135,3 +136,17 @@ def test_update_and_delete_community(app_services):
     comm_svc.delete_community(comm.id, owner_id)
     with pytest.raises(CommunityNotFoundError):
         comm_svc.get_community(comm.id)
+
+
+def test_domain_community_limit_validation():
+    # Below limit should pass without error
+    Community.validate_owner_community_count(0)
+    Community.validate_owner_community_count(9)
+
+    # At or above limit should raise CommunityLimitExceededError
+    with pytest.raises(CommunityLimitExceededError):
+        Community.validate_owner_community_count(10)
+
+    with pytest.raises(CommunityLimitExceededError):
+        Community.validate_owner_community_count(15)
+

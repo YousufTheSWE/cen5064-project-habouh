@@ -3,13 +3,15 @@ from domain.errors import (
     CommentNotFoundError,
     PostNotFoundError,
     UnauthorizedActionError,
+    UserBannedError,
 )
 
 
 class CommentService:
-    def __init__(self, repository, post_repository=None):
+    def __init__(self, repository, post_repository=None, community_repository=None):
         self._repository = repository
         self._post_repository = post_repository
+        self._community_repository = community_repository
 
     def create_comment(
         self,
@@ -21,6 +23,8 @@ class CommentService:
             post = self._post_repository.find_by_id(post_id)
             if post is None:
                 raise PostNotFoundError()
+            if self._community_repository and self._community_repository.is_banned(post.community_id, author_id):
+                raise UserBannedError("You are banned from commenting in this community")
 
         comment = Comment.create(
             author_id=author_id,
@@ -48,6 +52,10 @@ class CommentService:
         existing = self.get_comment(comment_id)
         if existing.author_id != user_id:
             raise UnauthorizedActionError("Only the comment author can edit this comment")
+        if self._post_repository and self._community_repository:
+            post = self._post_repository.find_by_id(existing.post_id)
+            if post and self._community_repository.is_banned(post.community_id, user_id):
+                raise UserBannedError("Banned users cannot edit comments in this community")
         updated = Comment(
             id=existing.id,
             author_id=existing.author_id,
@@ -55,6 +63,7 @@ class CommentService:
             description=description.strip(),
             upvotes=existing.upvotes,
             downvotes=existing.downvotes,
+            is_approved=0,  # resets approval on edit
         )
         self._repository.update(updated)
         return updated
@@ -74,6 +83,14 @@ class CommentService:
 
     def delete_comment(self, comment_id: int, user_id: int) -> None:
         existing = self.get_comment(comment_id)
-        if existing.author_id != user_id:
-            raise UnauthorizedActionError("Only the comment author can delete this comment")
+        is_mod_or_owner = False
+        if self._post_repository and self._community_repository:
+            post = self._post_repository.find_by_id(existing.post_id)
+            if post:
+                comm = self._community_repository.find_by_id(post.community_id)
+                if comm and comm.owner_id == user_id or self._community_repository.is_moderator(post.community_id, user_id):
+                    is_mod_or_owner = True
+
+        if existing.author_id != user_id and not is_mod_or_owner:
+            raise UnauthorizedActionError("Only the comment author or a moderator can delete this comment")
         self._repository.delete(comment_id)

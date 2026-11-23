@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
 from domain.errors import (
+    AlreadyApprovedError,
     AuthenticationRequiredError,
     CommentNotFoundError,
     CommunityLimitExceededError,
@@ -10,6 +11,7 @@ from domain.errors import (
     InvalidCredentialsError,
     PostNotFoundError,
     UnauthorizedActionError,
+    UserBannedError,
     UsernameAlreadyExistsError,
     UserNotFoundError,
 )
@@ -31,6 +33,14 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(UnauthorizedActionError)
     def forbidden(request: Request, exc: UnauthorizedActionError):
         return JSONResponse(status_code=403, content={"error": str(exc)})
+
+    @app.exception_handler(UserBannedError)
+    def user_banned(request: Request, exc: UserBannedError):
+        return JSONResponse(status_code=403, content={"error": str(exc)})
+
+    @app.exception_handler(AlreadyApprovedError)
+    def already_approved(request: Request, exc: AlreadyApprovedError):
+        return JSONResponse(status_code=400, content={"error": str(exc)})
 
     @app.exception_handler(UserNotFoundError)
     def user_not_found(request: Request, exc: UserNotFoundError):

@@ -13,6 +13,7 @@ class Post:
     description: str
     upvotes: int = 0
     downvotes: int = 0
+    is_approved: int = 0
 
     @staticmethod
     def create(
@@ -23,6 +24,7 @@ class Post:
         post_id: int | None = None,
         upvotes: int = 0,
         downvotes: int = 0,
+        is_approved: int = 0,
     ) -> "Post":
         clean_name = name.strip()
         if not clean_name:
@@ -36,4 +38,5 @@ class Post:
             description=description.strip(),
             upvotes=upvotes,
             downvotes=downvotes,
+            is_approved=is_approved,
         )

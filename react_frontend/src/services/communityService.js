@@ -10,8 +10,12 @@ export async function getCommunities() {
   return data
 }
 
-export async function getCommunity(id) {
-  const response = await fetch(`${BACKEND_DOMAIN}/communities/${id}`)
+export async function getCommunity(id, authToken = null) {
+  const headers = {}
+  if (authToken) {
+    headers.Authorization = `Bearer ${authToken}`
+  }
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${id}`, { headers })
   const data = await response.json()
   if (!response.ok) {
     throw new Error(data.error || 'Failed to load community')
@@ -77,6 +81,94 @@ export async function deleteCommunity(authToken, id) {
   const data = await response.json()
   if (!response.ok) {
     throw new Error(data.error || 'Failed to delete community')
+  }
+  return data
+}
+
+// Moderator Management
+export async function getModerators(authToken, communityId) {
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${communityId}/moderators`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to load moderators')
+  }
+  return data
+}
+
+export async function addModerator(authToken, communityId, target) {
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${communityId}/moderators`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({ target }),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to add moderator')
+  }
+  return data.moderator
+}
+
+export async function removeModerator(authToken, communityId, targetAccountId) {
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${communityId}/moderators/${targetAccountId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to remove moderator')
+  }
+  return data
+}
+
+// Banned User Management
+export async function getBannedUsers(authToken, communityId) {
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${communityId}/banned`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to load banned users')
+  }
+  return data
+}
+
+export async function banUser(authToken, communityId, target) {
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${communityId}/banned`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${authToken}`,
+    },
+    body: JSON.stringify({ target }),
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to ban user')
+  }
+  return data.banned
+}
+
+export async function unbanUser(authToken, communityId, targetAccountId) {
+  const response = await fetch(`${BACKEND_DOMAIN}/communities/${communityId}/banned/${targetAccountId}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  })
+  const data = await response.json()
+  if (!response.ok) {
+    throw new Error(data.error || 'Failed to unban user')
   }
   return data
 }
