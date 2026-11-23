@@ -2,6 +2,7 @@ from domain.errors import (
     CommunityNotFoundError,
     PostNotFoundError,
     UnauthorizedActionError,
+    UserBannedError,
 )
 from domain.post import Post
 
@@ -22,6 +23,8 @@ class PostService:
             community = self._community_repository.find_by_id(community_id)
             if community is None:
                 raise CommunityNotFoundError()
+            if self._community_repository.is_banned(community_id, author_id):
+                raise UserBannedError("You are banned from creating posts in this community")
 
         post = Post.create(
             author_id=author_id,
@@ -61,6 +64,7 @@ class PostService:
             description=description.strip(),
             upvotes=existing.upvotes,
             downvotes=existing.downvotes,
+            is_approved=0,  # resets approval on edit
         )
         self._repository.update(updated)
         return updated
@@ -80,6 +84,12 @@ class PostService:
 
     def delete_post(self, post_id: int, user_id: int) -> None:
         existing = self.get_post(post_id)
-        if existing.author_id != user_id:
-            raise UnauthorizedActionError("Only the post author can delete this post")
+        is_mod_or_owner = False
+        if self._community_repository:
+            comm = self._community_repository.find_by_id(existing.community_id)
+            if comm and comm.owner_id == user_id or self._community_repository.is_moderator(existing.community_id, user_id):
+                is_mod_or_owner = True
+
+        if existing.author_id != user_id and not is_mod_or_owner:
+            raise UnauthorizedActionError("Only the post author or a moderator can delete this post")
         self._repository.delete(post_id)

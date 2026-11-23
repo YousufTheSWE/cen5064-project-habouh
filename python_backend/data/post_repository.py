@@ -26,6 +26,8 @@ class SqlitePostRepository:
                 conn.execute("ALTER TABLE posts ADD COLUMN upvotes INTEGER DEFAULT 0")
             if "downvotes" not in cols:
                 conn.execute("ALTER TABLE posts ADD COLUMN downvotes INTEGER DEFAULT 0")
+            if "is_approved" not in cols:
+                conn.execute("ALTER TABLE posts ADD COLUMN is_approved INTEGER DEFAULT 0")
 
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS post_votes ("
@@ -38,8 +40,8 @@ class SqlitePostRepository:
     def add(self, post: Post) -> None:
         with self._db.connect() as conn:
             conn.execute(
-                "INSERT INTO posts (id, author_id, community_id, name, description, upvotes, downvotes) "
-                "VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO posts (id, author_id, community_id, name, description, upvotes, downvotes, is_approved) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 (
                     post.id,
                     post.author_id,
@@ -48,6 +50,7 @@ class SqlitePostRepository:
                     post.description,
                     post.upvotes,
                     post.downvotes,
+                    post.is_approved,
                 ),
             )
 
@@ -55,7 +58,7 @@ class SqlitePostRepository:
         with self._db.connect() as conn:
             cursor = conn.execute(
                 "SELECT id, author_id, community_id, name, description, "
-                "COALESCE(upvotes, 0), COALESCE(downvotes, 0) "
+                "COALESCE(upvotes, 0), COALESCE(downvotes, 0), COALESCE(is_approved, 0) "
                 "FROM posts WHERE id = ?",
                 (post_id,),
             )
@@ -70,13 +73,14 @@ class SqlitePostRepository:
                 description=row[4],
                 upvotes=row[5],
                 downvotes=row[6],
+                is_approved=row[7],
             )
 
     def list_by_community(self, community_id: int) -> list[Post]:
         with self._db.connect() as conn:
             cursor = conn.execute(
                 "SELECT id, author_id, community_id, name, description, "
-                "COALESCE(upvotes, 0), COALESCE(downvotes, 0) "
+                "COALESCE(upvotes, 0), COALESCE(downvotes, 0), COALESCE(is_approved, 0) "
                 "FROM posts WHERE community_id = ? ORDER BY id DESC",
                 (community_id,),
             )
@@ -89,6 +93,7 @@ class SqlitePostRepository:
                     description=row[4],
                     upvotes=row[5],
                     downvotes=row[6],
+                    is_approved=row[7],
                 )
                 for row in cursor.fetchall()
             ]
@@ -97,7 +102,7 @@ class SqlitePostRepository:
         with self._db.connect() as conn:
             cursor = conn.execute(
                 "SELECT id, author_id, community_id, name, description, "
-                "COALESCE(upvotes, 0), COALESCE(downvotes, 0) "
+                "COALESCE(upvotes, 0), COALESCE(downvotes, 0), COALESCE(is_approved, 0) "
                 "FROM posts ORDER BY id DESC"
             )
             return [
@@ -109,6 +114,7 @@ class SqlitePostRepository:
                     description=row[4],
                     upvotes=row[5],
                     downvotes=row[6],
+                    is_approved=row[7],
                 )
                 for row in cursor.fetchall()
             ]
@@ -116,8 +122,15 @@ class SqlitePostRepository:
     def update(self, post: Post) -> None:
         with self._db.connect() as conn:
             conn.execute(
-                "UPDATE posts SET name = ?, description = ? WHERE id = ?",
+                "UPDATE posts SET name = ?, description = ?, is_approved = 0 WHERE id = ?",
                 (post.name, post.description, post.id),
+            )
+
+    def set_approved(self, post_id: int, is_approved: int = 1) -> None:
+        with self._db.connect() as conn:
+            conn.execute(
+                "UPDATE posts SET is_approved = ? WHERE id = ?",
+                (is_approved, post_id),
             )
 
     def delete(self, post_id: int) -> None:

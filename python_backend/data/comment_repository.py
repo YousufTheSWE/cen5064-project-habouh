@@ -24,6 +24,8 @@ class SqliteCommentRepository:
                 conn.execute("ALTER TABLE comments ADD COLUMN upvotes INTEGER DEFAULT 0")
             if "downvotes" not in cols:
                 conn.execute("ALTER TABLE comments ADD COLUMN downvotes INTEGER DEFAULT 0")
+            if "is_approved" not in cols:
+                conn.execute("ALTER TABLE comments ADD COLUMN is_approved INTEGER DEFAULT 0")
 
             conn.execute(
                 "CREATE TABLE IF NOT EXISTS comment_votes ("
@@ -36,8 +38,8 @@ class SqliteCommentRepository:
     def add(self, comment: Comment) -> None:
         with self._db.connect() as conn:
             conn.execute(
-                "INSERT INTO comments (id, author_id, post_id, description, upvotes, downvotes) "
-                "VALUES (?, ?, ?, ?, ?, ?)",
+                "INSERT INTO comments (id, author_id, post_id, description, upvotes, downvotes, is_approved) "
+                "VALUES (?, ?, ?, ?, ?, ?, ?)",
                 (
                     comment.id,
                     comment.author_id,
@@ -45,6 +47,7 @@ class SqliteCommentRepository:
                     comment.description,
                     comment.upvotes,
                     comment.downvotes,
+                    comment.is_approved,
                 ),
             )
 
@@ -52,7 +55,7 @@ class SqliteCommentRepository:
         with self._db.connect() as conn:
             cursor = conn.execute(
                 "SELECT id, author_id, post_id, description, "
-                "COALESCE(upvotes, 0), COALESCE(downvotes, 0) "
+                "COALESCE(upvotes, 0), COALESCE(downvotes, 0), COALESCE(is_approved, 0) "
                 "FROM comments WHERE id = ?",
                 (comment_id,),
             )
@@ -66,13 +69,14 @@ class SqliteCommentRepository:
                 description=row[3],
                 upvotes=row[4],
                 downvotes=row[5],
+                is_approved=row[6],
             )
 
     def list_by_post(self, post_id: int) -> list[Comment]:
         with self._db.connect() as conn:
             cursor = conn.execute(
                 "SELECT id, author_id, post_id, description, "
-                "COALESCE(upvotes, 0), COALESCE(downvotes, 0) "
+                "COALESCE(upvotes, 0), COALESCE(downvotes, 0), COALESCE(is_approved, 0) "
                 "FROM comments WHERE post_id = ? ORDER BY id ASC",
                 (post_id,),
             )
@@ -84,6 +88,7 @@ class SqliteCommentRepository:
                     description=row[3],
                     upvotes=row[4],
                     downvotes=row[5],
+                    is_approved=row[6],
                 )
                 for row in cursor.fetchall()
             ]
@@ -91,8 +96,15 @@ class SqliteCommentRepository:
     def update(self, comment: Comment) -> None:
         with self._db.connect() as conn:
             conn.execute(
-                "UPDATE comments SET description = ? WHERE id = ?",
+                "UPDATE comments SET description = ?, is_approved = 0 WHERE id = ?",
                 (comment.description, comment.id),
+            )
+
+    def set_approved(self, comment_id: int, is_approved: int = 1) -> None:
+        with self._db.connect() as conn:
+            conn.execute(
+                "UPDATE comments SET is_approved = ? WHERE id = ?",
+                (is_approved, comment_id),
             )
 
     def delete(self, comment_id: int) -> None:

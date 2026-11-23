@@ -88,3 +88,17 @@ class CommunityLimitExceededError(DomainError):
         if not args:
             args = ("A user can be the owner of at most 10 communities",)
         super().__init__(*args)
+
+
+class UserBannedError(DomainError):
+    def __init__(self, *args):
+        if not args:
+            args = ("You are banned from this community",)
+        super().__init__(*args)
+
+
+class AlreadyApprovedError(DomainError):
+    def __init__(self, *args):
+        if not args:
+            args = ("This content has already been approved and cannot be reported unless edited",)
+        super().__init__(*args)

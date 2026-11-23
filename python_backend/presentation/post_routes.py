@@ -44,6 +44,7 @@ def post_routes(service, account_service) -> APIRouter:
             "upvotes": p.upvotes,
             "downvotes": p.downvotes,
             "user_vote": user_vote,
+            "is_approved": p.is_approved,
         }
 
     @router.post("", status_code=201)

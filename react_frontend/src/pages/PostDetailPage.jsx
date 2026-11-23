@@ -8,7 +8,9 @@ import {
   updateComment,
   voteComment,
 } from '../services/commentService'
+import { getCommunity } from '../services/communityService'
 import { deletePost, getPost, updatePost, votePost } from '../services/postService'
+import { reportComment, reportPost } from '../services/reportService'
 import './PostDetailPage.css'
 
 export default function PostDetailPage() {
@@ -17,9 +19,11 @@ export default function PostDetailPage() {
   const navigate = useNavigate()
 
   const [post, setPost] = useState(null)
+  const [community, setCommunity] = useState(null)
   const [comments, setComments] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [feedbackMsg, setFeedbackMsg] = useState('')
 
   // Edit Post state
   const [isEditingPost, setIsEditingPost] = useState(false)
@@ -41,10 +45,18 @@ export default function PostDetailPage() {
         setEditPostName(postData.name)
         setEditPostDesc(postData.description)
         setComments(commentsData)
+        return getCommunity(postData.community_id, authToken)
+      })
+      .then((commData) => {
+        if (commData) setCommunity(commData)
       })
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false))
   }, [postId, authToken])
+
+  const isBanned = community ? community.is_banned : false
+  const isPostAuthor = Number(accountId) === Number(post?.author_id)
+  const postScore = (post?.upvotes || 0) - (post?.downvotes || 0)
 
   const handleUpdatePost = async (e) => {
     e.preventDefault()
@@ -54,8 +66,9 @@ export default function PostDetailPage() {
         name: editPostName,
         description: editPostDesc,
       })
-      setPost((prev) => ({ ...prev, ...updated }))
+      setPost((prev) => ({ ...prev, ...updated, is_approved: 0 }))
       setIsEditingPost(false)
+      setFeedbackMsg('Post updated. Approval reset to normal.')
     } catch (err) {
       setError(err.message)
     }
@@ -86,6 +99,21 @@ export default function PostDetailPage() {
         downvotes: res.downvotes,
         user_vote: res.user_vote,
       }))
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
+  const handleReportPost = async () => {
+    if (!authToken) {
+      navigate('/signin')
+      return
+    }
+    setError('')
+    setFeedbackMsg('')
+    try {
+      await reportPost(authToken, postId)
+      setFeedbackMsg('Post reported to community moderators.')
     } catch (err) {
       setError(err.message)
     }
@@ -133,14 +161,30 @@ export default function PostDetailPage() {
     }
   }
 
+  const handleReportComment = async (comment) => {
+    if (!authToken) {
+      navigate('/signin')
+      return
+    }
+    setError('')
+    setFeedbackMsg('')
+    try {
+      await reportComment(authToken, comment.id)
+      setFeedbackMsg('Comment reported to community moderators.')
+    } catch (err) {
+      setError(err.message)
+    }
+  }
+
   const handleUpdateComment = async (commentId) => {
     setError('')
     try {
       const updated = await updateComment(authToken, commentId, {
         description: editCommentText,
       })
-      setComments(comments.map((c) => (c.id === commentId ? { ...c, ...updated } : c)))
+      setComments(comments.map((c) => (c.id === commentId ? { ...c, ...updated, is_approved: 0 } : c)))
       setEditingCommentId(null)
+      setFeedbackMsg('Comment updated. Approval reset to normal.')
     } catch (err) {
       setError(err.message)
     }
@@ -160,9 +204,6 @@ export default function PostDetailPage() {
   if (loading) return <div className="post-detail-page"><p className="empty-state">Loading post...</p></div>
   if (!post) return <div className="post-detail-page"><p className="empty-state">{error || 'Post not found'}</p></div>
 
-  const isPostAuthor = Number(accountId) === Number(post.author_id)
-  const postScore = (post.upvotes || 0) - (post.downvotes || 0)
-
   return (
     <div className="post-detail-page">
       <div style={{ marginBottom: '1.5rem', textAlign: 'left' }}>
@@ -175,7 +216,14 @@ export default function PostDetailPage() {
         </button>
       </div>
 
+      {isBanned && (
+        <div className="banned-banner">
+          ⚠️ You are banned from this community. You cannot comment or submit reports.
+        </div>
+      )}
+
       {error && <p className="auth-error">{error}</p>}
+      {feedbackMsg && <div className="success-banner">{feedbackMsg}</div>}
 
       <article className="post-main-card">
         {isEditingPost ? (
@@ -223,24 +271,39 @@ export default function PostDetailPage() {
             <div className="post-main-content">
               <div className="post-header-top">
                 <h1 className="post-detail-title">{post.name}</h1>
-                {isPostAuthor && (
-                  <div className="post-actions">
-                    <button
-                      type="button"
-                      className="btn-secondary btn-small"
-                      onClick={() => setIsEditingPost(true)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="btn-danger btn-small"
-                      onClick={handleDeletePost}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
+                <div className="post-actions">
+                  {post.is_approved ? (
+                    <span className="approved-pill">✓ Approved</span>
+                  ) : (
+                    user && !isBanned && (
+                      <button
+                        type="button"
+                        className="btn-report"
+                        onClick={handleReportPost}
+                      >
+                        🚩 Report
+                      </button>
+                    )
+                  )}
+                  {isPostAuthor && (
+                    <>
+                      <button
+                        type="button"
+                        className="btn-secondary btn-small"
+                        onClick={() => setIsEditingPost(true)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        type="button"
+                        className="btn-danger btn-small"
+                        onClick={handleDeletePost}
+                      >
+                        Delete
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
               <div className="post-detail-meta">
                 Posted by @{post.author_username || `user_${post.author_id}`}
@@ -256,7 +319,7 @@ export default function PostDetailPage() {
       <section className="comments-section">
         <h2 className="comments-header">Comments ({comments.length})</h2>
 
-        {user ? (
+        {user && !isBanned ? (
           <form onSubmit={handleCreateComment} className="comment-form-card">
             <textarea
               className="form-textarea"
@@ -276,6 +339,10 @@ export default function PostDetailPage() {
               </button>
             </div>
           </form>
+        ) : isBanned ? (
+          <div className="comment-form-card" style={{ textAlign: 'center' }}>
+            <p style={{ margin: 0, color: '#ef4444' }}>You cannot comment because you are banned in this community.</p>
+          </div>
         ) : (
           <div className="comment-form-card" style={{ textAlign: 'center' }}>
             <p style={{ margin: '0 0 0.75rem' }}>Sign in to leave a comment.</p>
@@ -323,27 +390,42 @@ export default function PostDetailPage() {
                         <span style={{ fontWeight: 600, color: 'var(--accent)' }}>
                           @{comment.author_username || `user_${comment.author_id}`}
                         </span>
-                        {isCommentAuthor && editingCommentId !== comment.id && (
-                          <div className="comment-actions">
-                            <button
-                              type="button"
-                              className="btn-secondary btn-small"
-                              onClick={() => {
-                                setEditingCommentId(comment.id)
-                                setEditCommentText(comment.description)
-                              }}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              type="button"
-                              className="btn-danger btn-small"
-                              onClick={() => handleDeleteComment(comment.id)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        )}
+                        <div className="comment-actions">
+                          {comment.is_approved ? (
+                            <span className="approved-pill">✓ Approved</span>
+                          ) : (
+                            user && !isBanned && (
+                              <button
+                                type="button"
+                                className="btn-report"
+                                onClick={() => handleReportComment(comment)}
+                              >
+                                🚩 Report
+                              </button>
+                            )
+                          )}
+                          {isCommentAuthor && editingCommentId !== comment.id && (
+                            <>
+                              <button
+                                type="button"
+                                className="btn-secondary btn-small"
+                                onClick={() => {
+                                  setEditingCommentId(comment.id)
+                                  setEditCommentText(comment.description)
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                type="button"
+                                className="btn-danger btn-small"
+                                onClick={() => handleDeleteComment(comment.id)}
+                              >
+                                Delete
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </div>
 
                       {editingCommentId === comment.id ? (
@@ -385,3 +467,4 @@ export default function PostDetailPage() {
     </div>
   )
 }
+
