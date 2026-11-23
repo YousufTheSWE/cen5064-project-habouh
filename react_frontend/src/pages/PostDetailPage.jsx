@@ -55,6 +55,7 @@ export default function PostDetailPage() {
   }, [postId, authToken])
 
   const isBanned = community ? community.is_banned : false
+  const isModerator = community ? community.is_moderator || community.is_owner : false
   const isPostAuthor = Number(accountId) === Number(post?.author_id)
   const postScore = (post?.upvotes || 0) - (post?.downvotes || 0)
 
@@ -68,7 +69,7 @@ export default function PostDetailPage() {
       })
       setPost((prev) => ({ ...prev, ...updated, is_approved: 0 }))
       setIsEditingPost(false)
-      setFeedbackMsg('Post updated. Approval reset to normal.')
+      setFeedbackMsg('Post updated successfully.')
     } catch (err) {
       setError(err.message)
     }
@@ -184,7 +185,7 @@ export default function PostDetailPage() {
       })
       setComments(comments.map((c) => (c.id === commentId ? { ...c, ...updated, is_approved: 0 } : c)))
       setEditingCommentId(null)
-      setFeedbackMsg('Comment updated. Approval reset to normal.')
+      setFeedbackMsg('Comment updated successfully.')
     } catch (err) {
       setError(err.message)
     }
@@ -218,7 +219,7 @@ export default function PostDetailPage() {
 
       {isBanned && (
         <div className="banned-banner">
-          ⚠️ You are banned from this community. You cannot comment or submit reports.
+          ⚠️ You are banned from this community. You cannot comment, edit, or submit reports.
         </div>
       )}
 
@@ -273,7 +274,7 @@ export default function PostDetailPage() {
                 <h1 className="post-detail-title">{post.name}</h1>
                 <div className="post-actions">
                   {post.is_approved ? (
-                    <span className="approved-pill">✓ Approved</span>
+                    isModerator && <span className="approved-pill">✓ Approved</span>
                   ) : (
                     user && !isBanned && (
                       <button
@@ -287,13 +288,15 @@ export default function PostDetailPage() {
                   )}
                   {isPostAuthor && (
                     <>
-                      <button
-                        type="button"
-                        className="btn-secondary btn-small"
-                        onClick={() => setIsEditingPost(true)}
-                      >
-                        Edit
-                      </button>
+                      {!isBanned && (
+                        <button
+                          type="button"
+                          className="btn-secondary btn-small"
+                          onClick={() => setIsEditingPost(true)}
+                        >
+                          Edit
+                        </button>
+                      )}
                       <button
                         type="button"
                         className="btn-danger btn-small"
@@ -392,7 +395,7 @@ export default function PostDetailPage() {
                         </span>
                         <div className="comment-actions">
                           {comment.is_approved ? (
-                            <span className="approved-pill">✓ Approved</span>
+                            isModerator && <span className="approved-pill">✓ Approved</span>
                           ) : (
                             user && !isBanned && (
                               <button
@@ -406,16 +409,18 @@ export default function PostDetailPage() {
                           )}
                           {isCommentAuthor && editingCommentId !== comment.id && (
                             <>
-                              <button
-                                type="button"
-                                className="btn-secondary btn-small"
-                                onClick={() => {
-                                  setEditingCommentId(comment.id)
-                                  setEditCommentText(comment.description)
-                                }}
-                              >
-                                Edit
-                              </button>
+                              {!isBanned && (
+                                <button
+                                  type="button"
+                                  className="btn-secondary btn-small"
+                                  onClick={() => {
+                                    setEditingCommentId(comment.id)
+                                    setEditCommentText(comment.description)
+                                  }}
+                                >
+                                  Edit
+                                </button>
+                              )}
                               <button
                                 type="button"
                                 className="btn-danger btn-small"

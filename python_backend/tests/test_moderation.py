@@ -10,6 +10,7 @@ from data.community_repository import SqliteCommunityRepository
 from data.database import Database
 from data.post_repository import SqlitePostRepository
 from domain.errors import (
+    CommentNotFoundError,
     DomainError,
     PostNotFoundError,
     UnauthorizedActionError,
@@ -155,3 +156,56 @@ def test_moderator_can_delete_reported_or_bad_post(mod_env):
     post_svc.delete_post(post.id, user_id=mod_id)
     with pytest.raises(PostNotFoundError):
         post_svc.get_post(post.id)
+
+
+def test_banned_user_cannot_edit_post_or_comment(mod_env):
+    comm_svc = mod_env["comm_svc"]
+    account_svc = mod_env["account_svc"]
+    post_svc = mod_env["post_svc"]
+    comment_svc = mod_env["comment_svc"]
+    comm_id = mod_env["comm_id"]
+    owner_id = mod_env["owner_id"]
+    bad_id = mod_env["bad_id"]
+
+    # Troublemaker creates post and comment BEFORE being banned
+    post = post_svc.create_post(bad_id, comm_id, "Original Title", "Original Body")
+    comment = comment_svc.create_comment(bad_id, post.id, "Original Comment")
+
+    # Ban troublemaker
+    comm_svc.ban_user(comm_id, current_user_id=owner_id, target_identifier="troublemaker", account_service=account_svc)
+
+    # Banned user cannot edit their post
+    with pytest.raises(UserBannedError):
+        post_svc.update_post(post.id, user_id=bad_id, name="Edited Title", description="Edited Body")
+
+    # Banned user cannot edit their comment
+    with pytest.raises(UserBannedError):
+        comment_svc.update_comment(comment.id, user_id=bad_id, description="Edited Comment Body")
+
+
+def test_banned_user_can_delete_own_post_and_comment(mod_env):
+    comm_svc = mod_env["comm_svc"]
+    account_svc = mod_env["account_svc"]
+    post_svc = mod_env["post_svc"]
+    comment_svc = mod_env["comment_svc"]
+    comm_id = mod_env["comm_id"]
+    owner_id = mod_env["owner_id"]
+    bad_id = mod_env["bad_id"]
+
+    # Troublemaker creates post and comment BEFORE being banned
+    post = post_svc.create_post(bad_id, comm_id, "Bad Post", "To be deleted")
+    comment = comment_svc.create_comment(bad_id, post.id, "Bad Comment")
+
+    # Ban troublemaker
+    comm_svc.ban_user(comm_id, current_user_id=owner_id, target_identifier="troublemaker", account_service=account_svc)
+
+    # Banned user CAN still delete their own comment
+    comment_svc.delete_comment(comment.id, user_id=bad_id)
+    with pytest.raises(CommentNotFoundError):
+        comment_svc.get_comment(comment.id)
+
+    # Banned user CAN still delete their own post
+    post_svc.delete_post(post.id, user_id=bad_id)
+    with pytest.raises(PostNotFoundError):
+        post_svc.get_post(post.id)
+

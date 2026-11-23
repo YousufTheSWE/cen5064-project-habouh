@@ -56,6 +56,8 @@ class PostService:
         existing = self.get_post(post_id)
         if existing.author_id != user_id:
             raise UnauthorizedActionError("Only the post author can edit this post")
+        if self._community_repository and self._community_repository.is_banned(existing.community_id, user_id):
+            raise UserBannedError("Banned users cannot edit posts in this community")
         updated = Post(
             id=existing.id,
             author_id=existing.author_id,

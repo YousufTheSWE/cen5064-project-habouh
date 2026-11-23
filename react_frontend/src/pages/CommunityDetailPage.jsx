@@ -328,7 +328,7 @@ export default function CommunityDetailPage() {
 
       {isBanned && (
         <div className="banned-banner">
-          ⚠️ You have been banned from this community by a moderator. You cannot create posts, comments, or submit reports.
+          ⚠️ You have been banned from this community by a moderator. You cannot create or edit posts/comments, or submit reports.
         </div>
       )}
 
@@ -557,7 +557,7 @@ export default function CommunityDetailPage() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <h3 className="post-item-title">{post.name}</h3>
                         {post.is_approved ? (
-                          <span className="approved-pill">✓ Approved</span>
+                          isModerator && <span className="approved-pill">✓ Approved</span>
                         ) : (
                           user && !isBanned && (
                             <button

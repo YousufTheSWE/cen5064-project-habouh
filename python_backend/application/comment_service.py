@@ -52,6 +52,10 @@ class CommentService:
         existing = self.get_comment(comment_id)
         if existing.author_id != user_id:
             raise UnauthorizedActionError("Only the comment author can edit this comment")
+        if self._post_repository and self._community_repository:
+            post = self._post_repository.find_by_id(existing.post_id)
+            if post and self._community_repository.is_banned(post.community_id, user_id):
+                raise UserBannedError("Banned users cannot edit comments in this community")
         updated = Comment(
             id=existing.id,
             author_id=existing.author_id,
